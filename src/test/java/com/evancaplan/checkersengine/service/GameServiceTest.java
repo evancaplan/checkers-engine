@@ -156,14 +156,4 @@ class GameServiceTest {
     void gameExists_returnsFalseForNonExistentGame() {
         assertFalse(gameService.gameExists("non-existent-id"));
     }
-
-    @Test
-    void deleteGame_shouldRemoveGame() {
-        String gameId = gameService.startNewGame(StartGameRequest.builder().build());
-        assertTrue(gameService.gameExists(gameId));
-        
-        gameService.deleteGame(gameId);
-        
-        assertFalse(gameService.gameExists(gameId));
-    }
 }

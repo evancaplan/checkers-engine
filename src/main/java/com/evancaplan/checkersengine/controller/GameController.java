@@ -43,9 +43,7 @@ public class GameController {
 
         GameResponse response = GameResponse.builder()
                 .gameId(moveRequest.getGameId())
-                .message(moveSuccess
-                        ? "Move applied successfully"
-                        : "Illegal move – please try again")
+                .message(moveSuccess ? "Move applied successfully" : "Illegal move! Please try again")
                 .build();
 
         return moveSuccess
@@ -61,10 +59,6 @@ public class GameController {
                     .body(buildNotFoundResponse(gameId));
         }
         var board = gameService.getBoardState(gameId);
-        if (board == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(buildNotFoundResponse(gameId));
-        }
         BoardStateResponse boardResponse = BoardStateResponse.fromBoard(gameId, board);
         return ResponseEntity.ok(boardResponse);
     }

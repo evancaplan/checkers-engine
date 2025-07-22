@@ -70,10 +70,6 @@ public class GameService {
         return true;
     }
 
-    public void deleteGame(String gameId) {
-        games.remove(gameId);
-    }
-
     public boolean gameExists(String gameId) {
         return games.containsKey(gameId);
     }
