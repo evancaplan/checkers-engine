@@ -22,7 +22,7 @@ public class PieceTest {
                 .color(BLACK)
                 .king(true)
                 .row(5)
-                .col(2)
+                .column(2)
                 .build();
         assertTrue(piece.isKing());
 
@@ -87,7 +87,7 @@ public class PieceTest {
                 .color(RED)
                 .king(true)
                 .row(3)
-                .col(4)
+                .column(4)
                 .build();
 
         assertTrue(piece.isValidDirectionalMove(-1));

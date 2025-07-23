@@ -32,7 +32,17 @@ public class Move {
                 .piece(piece)
                 .build();
     }
-    
+
+    public static Move from(Piece piece, Board.Delta destination) {
+        return Move.builder()
+                .fromRow(piece.getRow())
+                .fromCol(piece.getColumn())
+                .toRow(destination.row())
+                .toCol(destination.column())
+                .piece(piece)
+                .build();
+    }
+
     public boolean isCapture() {
         return capturedPieces != null && !capturedPieces.isEmpty();
     }

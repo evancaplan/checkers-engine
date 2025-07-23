@@ -15,7 +15,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import static com.evancaplan.checkersengine.model.Piece.PieceColor.*;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class GameService {
@@ -27,7 +26,6 @@ public class GameService {
     public String startNewGame(StartGameRequest request) {
         String id = UUID.randomUUID().toString();
         games.put(id, Board.createStandardBoard(request.getSinglePlayer()));
-        log.debug("Started new game {}", id);
         return id;
     }
 
@@ -44,7 +42,6 @@ public class GameService {
 
         Piece piece = board.getPieceAt(request.getFromRow(), request.getFromCol());
 
-        // Allow moves for both RED and BLACK pieces in tests
         if (piece == null || piece.getColor() != board.getCurrentTurn()) {
             return false;
         }

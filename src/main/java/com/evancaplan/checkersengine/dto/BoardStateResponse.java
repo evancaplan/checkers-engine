@@ -58,7 +58,7 @@ public class BoardStateResponse {
                             .color(piece.getColor().toString())
                             .king(piece.isKing())
                             .row(piece.getRow())
-                            .col(piece.getCol())
+                            .col(piece.getColumn())
                             .build();
                     response.getPieces().add(pieceDto);
                 }

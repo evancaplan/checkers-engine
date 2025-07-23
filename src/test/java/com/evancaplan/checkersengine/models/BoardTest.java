@@ -54,8 +54,8 @@ public class BoardTest {
         Piece redPiece = new Piece(RED, 3, 3);
         Piece blackPiece = new Piece(BLACK, 5, 5);
 
-        board.setPieceAt(redPiece.getRow(), redPiece.getCol(), redPiece);
-        board.setPieceAt(blackPiece.getRow(), blackPiece.getCol(), blackPiece);
+        board.setPieceAt(redPiece.getRow(), redPiece.getColumn(), redPiece);
+        board.setPieceAt(blackPiece.getRow(), blackPiece.getColumn(), blackPiece);
 
         board.getRedPieces().add(redPiece);
         board.getBlackPieces().add(blackPiece);
@@ -72,8 +72,8 @@ public class BoardTest {
         Piece redPiece = new Piece(RED, 3, 3);
         Piece blackPiece = new Piece(BLACK, 2, 2);
 
-        board.setPieceAt(redPiece.getRow(), redPiece.getCol(), redPiece);
-        board.setPieceAt(blackPiece.getRow(), blackPiece.getCol(), blackPiece);
+        board.setPieceAt(redPiece.getRow(), redPiece.getColumn(), redPiece);
+        board.setPieceAt(blackPiece.getRow(), blackPiece.getColumn(), blackPiece);
 
         board.getRedPieces().add(redPiece);
         board.getBlackPieces().add(blackPiece);
@@ -95,7 +95,7 @@ public class BoardTest {
         // Set up a board with a simple move
         Piece redPiece = new Piece(RED, 3, 3);
 
-        board.setPieceAt(redPiece.getRow(), redPiece.getCol(), redPiece);
+        board.setPieceAt(redPiece.getRow(), redPiece.getColumn(), redPiece);
         board.getRedPieces().add(redPiece);
         board.setCurrentTurn(RED);
 
@@ -126,8 +126,8 @@ public class BoardTest {
         Piece redPiece = new Piece(RED, 3, 3);
         Piece blackPiece = new Piece(BLACK, 2, 2);
 
-        board.setPieceAt(redPiece.getRow(), redPiece.getCol(), redPiece);
-        board.setPieceAt(blackPiece.getRow(), blackPiece.getCol(), blackPiece);
+        board.setPieceAt(redPiece.getRow(), redPiece.getColumn(), redPiece);
+        board.setPieceAt(blackPiece.getRow(), blackPiece.getColumn(), blackPiece);
 
         board.getRedPieces().add(redPiece);
         board.getBlackPieces().add(blackPiece);

@@ -16,17 +16,17 @@ public class Piece {
     private PieceColor color;
     private boolean king;
     private int row;
-    private int col;
+    private int column;
 
     public enum PieceColor {
         BLACK, RED
     }
 
-    public Piece(PieceColor color, int row, int col) {
+    public Piece(PieceColor color, int row, int column) {
         this.color = color;
         this.king = false;
         this.row = row;
-        this.col = col;
+        this.column = column;
     }
 
     public void makeKing() {

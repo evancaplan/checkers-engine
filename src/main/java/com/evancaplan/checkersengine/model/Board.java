@@ -1,8 +1,6 @@
 package com.evancaplan.checkersengine.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -16,11 +14,14 @@ import static com.evancaplan.checkersengine.model.Piece.PieceColor.RED;
 @AllArgsConstructor
 @Builder
 public class Board {
+    // valid diagonal movements
     private static final int[][] BASIC_MOVE_DIRECTIONS = {{-1, -1}, {-1, 1}, {1, -1}, {1, 1}};
     public static final int BOARD_SIZE = 8;
     public static final int NUM_PIECES = 12;
 
+    // lockdown getter in case someone wants to manipulate the board directly
     @Builder.Default
+    @Getter(AccessLevel.NONE)
     private Piece[][] squares = new Piece[BOARD_SIZE][BOARD_SIZE];
     @Builder.Default
     private List<Piece> redPieces = new ArrayList<>();
@@ -46,10 +47,10 @@ public class Board {
         initializePieces(RED, BOARD_SIZE - 3, BOARD_SIZE - 1);
     }
 
-    private void initializePieces(Piece.PieceColor color, int fromRow, int toRowInclusive) {
-        for (int row = fromRow; row <= toRowInclusive; row++) {
+    private void initializePieces(Piece.PieceColor color, int fromRow, int toRow) {
+        for (int row = fromRow; row <= toRow; row++) {
             for (int col = 0; col < BOARD_SIZE; col++) {
-                // only place pieces dark squares (row+col is odd) hold pieces at start
+                // only place pieces on dark squares (row+column is odd)
                 if ((row + col) % 2 == 1) {
                     Piece piece = new Piece(color, row, col);
                     squares[row][col] = piece;
@@ -58,7 +59,6 @@ public class Board {
             }
         }
     }
-
 
     public Piece getPieceAt(int row, int col) {
         if (isOnBoard(row, col)) {
@@ -73,7 +73,7 @@ public class Board {
             squares[row][col] = piece;
             if (piece != null) {
                 piece.setRow(row);
-                piece.setCol(col);
+                piece.setColumn(col);
             }
         }
     }
@@ -92,25 +92,21 @@ public class Board {
         return null;
     }
 
+    // check for possible captures for a given piece
     public List<Move> getCaptureMovesForPiece(Piece piece) {
         return getDiagonalDestinationsForPiece(piece, 2).stream()
-                .filter(dest -> getPieceAt(dest.row(), dest.col()) == null)
+                .filter(dest -> getPieceAt(dest.row(), dest.column()) == null)
                 .map(dest -> buildCaptureMove(piece, dest))
                 .filter(Objects::nonNull)
                 .toList();
     }
 
+    // check for simple diagonal moves for a given piece
     public List<Move> getSimpleMovesForPiece(Piece piece) {
         return getDiagonalDestinationsForPiece(piece, 1).stream()
-                .filter(dest -> getPieceAt(dest.row(), dest.col()) == null)
-                .filter(dest -> piece.isValidDirectionalMove(dest.deltaRow()))
-                .map(dest -> Move.builder()
-                        .fromRow(piece.getRow())
-                        .fromCol(piece.getCol())
-                        .toRow(dest.row())
-                        .toCol(dest.col())
-                        .piece(piece)
-                        .build())
+                .filter(destination -> getPieceAt(destination.row(), destination.column()) == null)
+                .filter(destination -> piece.isValidDirectionalMove(destination.deltaRow()))
+                .map(destination -> Move.from(piece, destination))
                 .toList();
     }
 
@@ -123,7 +119,7 @@ public class Board {
         int changeInRow = move.getToRow() - move.getFromRow();
         int changeInColumn = move.getToCol() - move.getFromCol();
 
-        // check if it is a capture
+        // check if it is a capture (row increases by 2)
         if (Math.abs(changeInRow) == 2) {
             Piece jumped = getPieceAt(move.getFromRow() + changeInRow / 2, move.getFromCol() + changeInColumn / 2);
             if (jumped != null && jumped.getColor() != piece.getColor()) {
@@ -131,7 +127,7 @@ public class Board {
             }
         }
 
-        // physically move the piece
+        // move the piece
         setPieceAt(move.getFromRow(), move.getFromCol(), null);
         setPieceAt(move.getToRow(), move.getToCol(), piece);
 
@@ -141,7 +137,7 @@ public class Board {
         move.getCapturedPieces().forEach(this::removePiece);
 
         // change turn only if no further capture is mandatory
-        if (!hasAnyCapture(currentTurn)) {
+        if (!hasAnyCapturePossibilities(currentTurn)) {
             toggleTurn();
         }
     }
@@ -152,32 +148,37 @@ public class Board {
         if (piece == null) {
             return false;
         }
+        // it is not this colors turn
         if (piece.getColor() != currentTurn) {
             return false;
         }
+        // the proposed move is out of bounds
         if (!isOnBoard(move.getToRow(), move.getToCol())) {
             return false;
         }
+        // there is a piece of the same color already in that spot
         if (getPieceAt(move.getToRow(), move.getToCol()) != null) {
             return false;
         }
 
-        // check it is diagonal
+        // check it is diagonal (change in row does not equal change in column)
         int changeInRow = move.getToRow() - move.getFromRow();
         int changeInColumn = move.getToCol() - move.getFromCol();
         if (Math.abs(changeInColumn) != Math.abs(changeInRow)) {
             return false;
         }
 
+        // check that the piece is moving in the correct direction
         if (Math.abs(changeInRow) == 1) {
             // cannot make a simple move when any capture is available
-            if (hasAnyCapture(currentTurn)) {
+            if (hasAnyCapturePossibilities(currentTurn)) {
                 return false;
             }
 
             return piece.isValidDirectionalMove(changeInRow);
         }
 
+        // check that if jumping a piece it is in a valid direction and the piece isn't the same color
         if (Math.abs(changeInRow) == 2) {
             int jumpedRow = move.getFromRow() + changeInRow / 2;
             int jumpedCol = move.getFromCol() + changeInColumn / 2;
@@ -193,7 +194,7 @@ public class Board {
 
     private void removePiece(Piece piece) {
         if (piece != null) {
-            setPieceAt(piece.getRow(), piece.getCol(), null);
+            setPieceAt(piece.getRow(), piece.getColumn(), null);
             if (piece.getColor() == RED) {
                 redPieces.remove(piece);
             } else {
@@ -218,13 +219,14 @@ public class Board {
         return !getCaptureMovesForPiece(piece).isEmpty();
     }
 
-    private boolean hasAnyCapture(Piece.PieceColor color) {
+    private boolean hasAnyCapturePossibilities(Piece.PieceColor color) {
         return getPiecesForColor(color).stream().anyMatch(this::canCapture);
     }
 
     private Move buildCaptureMove(Piece piece, Delta destination) {
+       // calculate the square for the piece to be jumped
         int midRow = piece.getRow() + destination.deltaRow() / 2;
-        int midCol = piece.getCol() + destination.deltaCol() / 2;
+        int midCol = piece.getColumn() + destination.deltaCol() / 2;
         Piece jumped = getPieceAt(midRow, midCol);
 
         if (jumped == null || jumped.getColor() == piece.getColor()) {
@@ -234,13 +236,7 @@ public class Board {
             return null;
         }
 
-        Move move = Move.builder()
-                .fromRow(piece.getRow())
-                .fromCol(piece.getCol())
-                .toRow(destination.row())
-                .toCol(destination.col())
-                .piece(piece)
-                .build();
+        Move move = Move.from(piece, destination);
 
         move.getCapturedPieces().add(jumped);
 
@@ -248,16 +244,18 @@ public class Board {
     }
 
     private List<Delta> getDiagonalDestinationsForPiece(Piece piece, int distance) {
-       // iterate over basic directional moves and return a list of possible destinations
+        // iterate over basic directional moves and return a list of possible destinations on the board
         return Arrays.stream(BASIC_MOVE_DIRECTIONS)
-                .map(dir -> new Delta(
-                        piece.getRow() + dir[0] * distance,
-                        piece.getCol() + dir[1] * distance,
-                        dir[0] * distance,
-                        dir[1] * distance))
-                .filter(d -> isOnBoard(d.row(), d.col()))
+                .map(direction -> new Delta(
+                        piece.getRow() + direction[0] * distance,
+                        piece.getColumn() + direction[1] * distance,
+                        direction[0] * distance,
+                        direction[1] * distance))
+                .filter(delta -> isOnBoard(delta.row(), delta.column()))
                 .toList();
     }
 
-    private record Delta(int row, int col, int deltaRow, int deltaCol) { }
+    // represents a diagonal landing square
+    public record Delta(int row, int column, int deltaRow, int deltaCol) {
+    }
 }
