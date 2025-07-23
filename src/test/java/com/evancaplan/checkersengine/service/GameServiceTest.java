@@ -120,8 +120,8 @@ class GameServiceTest {
         String gameId = gameService.startNewGame(StartGameRequest.builder().build());
         Board board = gameService.getBoardState(gameId);
         
-        // Force the turn to RED so our move is allowed
-        board.setCurrentTurn(Piece.PieceColor.RED);
+        // Force the turn to BLACK so our move is allowed
+        board.setCurrentTurn(Piece.PieceColor.BLACK);
         
         // Setup the moveService to return true for any move
         when(moveService.apply(any(), any())).thenReturn(true);
@@ -129,13 +129,13 @@ class GameServiceTest {
         // Setup the moveService to return null for AI move to simplify the test
         when(moveService.generateAIMove(any())).thenReturn(null);
         
-        // Create a move request with coordinates that have a RED piece
+        // Create a move request with coordinates that have a BLACK piece
         MoveRequest request = MoveRequest.builder()
                 .gameId(gameId)
-                .fromRow(5)  // Position with a RED piece in standard board
-                .fromCol(0)
-                .toRow(4)
-                .toCol(1)
+                .fromRow(2)  // Position with a BLACK piece in standard board
+                .fromCol(7)
+                .toRow(3)
+                .toCol(6)
                 .build();
         
         // Execute the method under test

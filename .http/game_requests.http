@@ -1,0 +1,29 @@
+### Start a new game (single-player)
+
+POST http://localhost:8080/api/game/new
+Content-Type: application/json
+
+{
+  "singlePlayer": true
+}
+
+> {%
+    client.global.set("gameId",  response.body.gameId);
+%}
+
+### Get the state of a game by the id
+
+http://localhost:8080/api/game/state?gameId={{gameId}}
+Content-Type: application/json
+
+### Make a move
+POST http://localhost:8080/api/game/move
+Content-Type: application/json
+
+{
+  "gameId": "{{gameId}}",
+  "fromRow": 2,
+  "fromCol": 7,
+  "toRow": 3,
+  "toCol": 6
+}

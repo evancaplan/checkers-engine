@@ -56,8 +56,8 @@ public class GameService {
             return true;
         }
 
-        // only generate AI move if the player is RED and the flag for single player is true
-        if (board.isSinglePlayer() && piece.getColor() == RED) {
+        // only generate AI move if the player is BLACK and the flag for single player is true
+        if (board.isSinglePlayer() && piece.getColor() == BLACK) {
             Move aiMove = moveService.generateAIMove(board);
             if (aiMove != null) {
                 moveService.apply(board, aiMove);

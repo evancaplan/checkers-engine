@@ -25,16 +25,16 @@ public class MoveService {
     // Simple AI move generator
     // First capture it can make, else first legal step.
     public Move generateAIMove(Board board) {
-        List<Piece> blackPieces = board.getBlackPieces();
+        List<Piece> redPieces = board.getRedPieces();
         
-        for (Piece piece : blackPieces) {
+        for (Piece piece : redPieces) {
             List<Move> captureMoves = board.getCaptureMovesForPiece(piece);
             if (!captureMoves.isEmpty()) {
                 return captureMoves.getFirst();
             }
         }
         
-       for (Piece piece : blackPieces) {
+       for (Piece piece : redPieces) {
             List<Move> simpleMoves = board.getSimpleMovesForPiece(piece);
             if (!simpleMoves.isEmpty()) {
                 return simpleMoves.getFirst();
